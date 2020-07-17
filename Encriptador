@@ -1,0 +1,60 @@
+package hm;
+import java.security.*;
+import javax.crypto.Cipher;
+import javax.swing.*;
+public class HolaMundo {
+
+   private static Cipher rsa;  //  Private que sirve para encriptar.
+
+   public static void main(String[] args) throws Exception {
+
+      //  Generamos un par de claves:
+      KeyPairGenerator keyPairGenerator
+                             = KeyPairGenerator.getInstance( "RSA" );
+      KeyPair keyPair        = keyPairGenerator.generateKeyPair();
+      PublicKey publicKey    = keyPair.getPublic();
+      PrivateKey privateKey  = keyPair.getPrivate();
+
+      //  Obtenemos la clase para encriptar/desencriptar.
+      rsa = Cipher.getInstance( "RSA/ECB/PKCS1Padding" );
+
+      //  El texto a encriptar.
+      String textoAEncriptar = JOptionPane.showInputDialog(
+                                         "Ingrese el texto a encriptar"
+                                                          );
+
+      //  Validación:       if( textoAEncriptar.length()>117 ) {
+         JOptionPane.showMessageDialog(
+              null,
+              "El texto ingresado no puede ser mayor a los 117 caracteres"
+                                      );
+         System.exit( 0 );
+      }
+
+      //  Encriptamos-------------------------------------       rsa.init( Cipher.ENCRYPT_MODE, publicKey );
+      byte[] encriptado = rsa.doFinal( textoAEncriptar.getBytes() );
+                                                    //  No mayor a 117.
+
+      // Escribimos el encriptado para verlo, con caracteres visibles       String strEncriptado = "";
+      for( byte b : encriptado ) {
+         strEncriptado += Integer.toHexString( 0xFF & b );
+      }
+
+      //  Desencriptamos----------------------------------       rsa.init( Cipher.DECRYPT_MODE , privateKey );
+      byte[] bytesDesencriptados = rsa.doFinal( encriptado );
+      String textoDesencriptado = new String( bytesDesencriptados );
+
+      //  Mostramos el texto desencriptado.
+      JOptionPane.showMessageDialog(
+                 null,
+                 "El texto ingresado es \"" +
+                     textoAEncriptar +
+                     "\"\nEl encriptado es          \"" +
+                     strEncriptado +
+                     "\"\nEl desencriptado es   \"" +
+                     textoDesencriptado +
+                     "\""
+                                   );
+   }
+
+}
